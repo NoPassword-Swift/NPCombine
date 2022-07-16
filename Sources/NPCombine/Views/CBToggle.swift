@@ -14,7 +14,7 @@ public class CBToggle: NPToggle {
 	private var subjectSend: ((Bool) -> Void)?
 	private var subscription: AnyCancellable?
 
-	public init(tracking subject: CBSubject<Bool>? = nil) {
+	public init<S: Subject>(tracking subject: S? = nil) where S.Output == Bool {
 		super.init()
 		self.addAction(UIAction { [weak self] _ in
 			guard let self = self else { return }
