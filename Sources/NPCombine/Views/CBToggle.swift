@@ -27,22 +27,25 @@ public class CBToggle: NPToggle {
 		fatalError("init(coder:) has not been implemented")
 	}
 
-	public func track(subject: CBSubject<Bool>?) {
-		if let subject = subject {
-			self.subjectSend = { subject.send($0) }
-			self.subscription = subject
-				.receive(on: DispatchQueue.mainIfNeeded)
-				.sink { [weak self] value in
-					guard let self = self else { return }
-					self.setOn(value, animated: true)
-				}
-			self.isOn = subject.value
-			self.isEnabled = true
-		} else {
-			self.subscription = nil
-			self.isOn = false
-			self.isEnabled = false
-		}
+	public func track<S: Subject>(subject: S?) where S.Output == Bool {
+		guard let subject = subject else { return self.stopTracking() }
+		self.subjectSend = { subject.send($0) }
+		self.subscription = subject
+			.receive(on: DispatchQueue.mainIfNeeded)
+			.sink(receiveCompletion: { [weak self] _ in
+				guard let self = self else { return }
+				self.stopTracking()
+			}, receiveValue: { [weak self] value in
+				guard let self = self else { return }
+				self.setOn(value, animated: true)
+			})
+		self.isEnabled = true
+	}
+
+	private func stopTracking() {
+		self.subscription = nil
+		self.isOn = false
+		self.isEnabled = false
 	}
 }
 
