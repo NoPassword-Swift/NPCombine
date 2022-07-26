@@ -8,6 +8,7 @@
 import Combine
 import CoreCombine
 import Font
+import NPKit
 import UIKit
 
 public class CBButton: UIButton {
@@ -45,13 +46,7 @@ public class CBButton: UIButton {
 		self.subscription = nil
 	}
 
-	public static func make() -> UIButton {
-		let button = UIButton(type: .system)
-		button.titleLabel?.font = Font.body
-		button.titleLabel?.adjustsFontForContentSizeCategory = true
-		button.translatesAutoresizingMaskIntoConstraints = false
-		return button
-	}
+	public static func make() -> UIButton { NPButton.make() }
 }
 
 #endif
