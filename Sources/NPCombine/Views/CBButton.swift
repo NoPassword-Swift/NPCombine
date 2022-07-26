@@ -7,14 +7,15 @@
 
 import Combine
 import CoreCombine
+import Font
 import UIKit
 
 public class CBButton: UIButton {
 	private var subscription: AnyCancellable?
 
-	public func track<S: Subject>(subject: S?) where S.Output == String {
-		guard let subject = subject else { return self.stopTracking() }
-		self.subscription = subject
+	public func track<P: Publisher>(publisher: P?) where P.Output == String {
+		guard let publisher = publisher else { return self.stopTracking() }
+		self.subscription = publisher
 			.receive(on: DispatchQueue.mainIfNeeded)
 			.sink(receiveCompletion: { [weak self] _ in
 				guard let self = self else { return }
@@ -26,9 +27,9 @@ public class CBButton: UIButton {
 			})
 	}
 
-	public func track<S: Subject>(localizedSubject subject: S?) where S.Output: CustomLocalizedStringConvertible {
-		guard let subject = subject else { return self.stopTracking() }
-		self.subscription = subject
+	public func track<P: Publisher>(localizedPublisher publisher: P?) where P.Output: CustomLocalizedStringConvertible {
+		guard let publisher = publisher else { return self.stopTracking() }
+		self.subscription = publisher
 			.receive(on: DispatchQueue.mainIfNeeded)
 			.sink(receiveCompletion: { [weak self] _ in
 				guard let self = self else { return }
@@ -42,6 +43,14 @@ public class CBButton: UIButton {
 
 	private func stopTracking() {
 		self.subscription = nil
+	}
+
+	public static func make() -> UIButton {
+		let button = UIButton(type: .system)
+		button.titleLabel?.font = Font.body
+		button.titleLabel?.adjustsFontForContentSizeCategory = true
+		button.translatesAutoresizingMaskIntoConstraints = false
+		return button
 	}
 }
 

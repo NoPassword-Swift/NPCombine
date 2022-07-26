@@ -14,12 +14,16 @@ public class CBToggle: NPToggle {
 	private var subjectSend: ((Bool) -> Void)?
 	private var subscription: AnyCancellable?
 
-	public init<S: Subject>(tracking subject: S? = nil) where S.Output == Bool {
+	public override init() {
 		super.init()
 		self.addAction(UIAction { [weak self] _ in
 			guard let self = self else { return }
 			self.subjectSend?(self.isOn)
 		}, for: .valueChanged)
+	}
+
+	public convenience init<S: Subject>(tracking subject: S) where S.Output == Bool {
+		self.init()
 		self.track(subject: subject)
 	}
 
@@ -42,7 +46,7 @@ public class CBToggle: NPToggle {
 		self.isEnabled = true
 	}
 
-	private func stopTracking() {
+	public func stopTracking() {
 		self.subscription = nil
 		self.isOn = false
 		self.isEnabled = false
